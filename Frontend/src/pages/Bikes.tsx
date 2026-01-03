@@ -9,11 +9,7 @@ import {
   InputNumber,
   Tag,
 } from "antd";
-import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import DashboardLayout from "../layout/DashboardLayout";
 import {
@@ -23,18 +19,18 @@ import {
   useDeleteBikeMutation,
 } from "../slice/services/bikeApi";
 
-
 const { confirm } = Modal;
 
 const Bikes = () => {
   const role = localStorage.getItem("role");
+  const [searchText, setSearchText] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBike, setSelectedBike] = useState<any>(null);
   const { data: bikes = [], isLoading } = useGetBikesQuery();
-const [addBike] = useAddBikeMutation();
-const [updateBike] = useUpdateBikeMutation();
-const [deleteBike] = useDeleteBikeMutation();
+  const [addBike] = useAddBikeMutation();
+  const [updateBike] = useUpdateBikeMutation();
+  const [deleteBike] = useDeleteBikeMutation();
 
   const [form] = Form.useForm();
 
@@ -103,32 +99,41 @@ const [deleteBike] = useDeleteBikeMutation();
       : {},
   ].filter(Boolean);
 
- 
-
- const handleAddBike = async (values: any) => {
-  await addBike(values);
-  setIsAddModalOpen(false);
-};
+  const handleAddBike = async (values: any) => {
+    await addBike(values);
+    setIsAddModalOpen(false);
+  };
 
   const handleEditBike = async (values: any) => {
-    console.log(values)
-  await updateBike({ id: selectedBike._id, ...values });
-  setIsEditModalOpen(false);
-};
+    console.log(values);
+    await updateBike({ id: selectedBike._id, ...values });
+    setIsEditModalOpen(false);
+  };
 
   const showDeleteConfirm = (bike: any) => {
-  confirm({
-    title: "Delete Bike",
-    content: `Delete ${bike.model}?`,
-    okType: "danger",
-    onOk() {
-      deleteBike(bike._id);
-    },
-  });
-};
+    confirm({
+      title: "Delete Bike",
+      content: `Delete ${bike.model}?`,
+      okType: "danger",
+      onOk() {
+        deleteBike(bike._id);
+      },
+    });
+  };
+  const filteredBikes = bikes.filter(
+    (bike: any) =>
+      bike.bikemodel.toLowerCase().includes(searchText.toLowerCase()) ||
+      bike.company.toLowerCase().includes(searchText.toLowerCase())
+  );
 
   return (
     <DashboardLayout>
+      <Input
+        placeholder="Search by Model or Company"
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{ width: 300, margin: 10 }}
+      />
       <Card
         title="Bike Management"
         extra={
@@ -145,7 +150,7 @@ const [deleteBike] = useDeleteBikeMutation();
       >
         <Table
           columns={columns as any}
-          dataSource={bikes}
+          dataSource={filteredBikes}
           pagination={{ pageSize: 5 }}
           loading={isLoading}
         />
@@ -159,15 +164,27 @@ const [deleteBike] = useDeleteBikeMutation();
         footer={null}
       >
         <Form layout="vertical" onFinish={handleAddBike}>
-          <Form.Item label="Model Name" name="bikemodel" rules={[{ required: true }]}>
+          <Form.Item
+            label="Model Name"
+            name="bikemodel"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
 
-          <Form.Item label="Company" name="company" rules={[{ required: true }]}>
+          <Form.Item
+            label="Company"
+            name="company"
+            rules={[{ required: true }]}
+          >
             <Input />
           </Form.Item>
 
-          <Form.Item label="Engine (CC)" name="engine" rules={[{ required: true }]}>
+          <Form.Item
+            label="Engine (CC)"
+            name="engine"
+            rules={[{ required: true }]}
+          >
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
 
@@ -175,7 +192,11 @@ const [deleteBike] = useDeleteBikeMutation();
             <Input />
           </Form.Item>
 
-          <Form.Item label="Price (₹)" name="price" rules={[{ required: true }]}>
+          <Form.Item
+            label="Price (₹)"
+            name="price"
+            rules={[{ required: true }]}
+          >
             <InputNumber style={{ width: "100%" }} />
           </Form.Item>
 

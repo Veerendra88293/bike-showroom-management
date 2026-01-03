@@ -11,6 +11,7 @@ import {
 const { confirm } = Modal;
 
 const Customers = () => {
+  const [searchText, setSearchText] = useState("");
   const { data: customers = [], isLoading } = useGetCustomersQuery();
   const [addCustomer] = useAddCustomerMutation();
   const [deleteCustomer] = useDeleteCustomerMutation();
@@ -77,9 +78,20 @@ const Customers = () => {
       },
     });
   };
+  const filteredCustomers = customers.filter(
+    (customer: any) =>
+      customer.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      customer.phone.includes(searchText)
+  );
 
   return (
     <DashboardLayout>
+      <Input
+        placeholder="Search by Name or Phone"
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        style={{ width: 300, margin: 16 }}
+      />
       <Card
         title="Customer Management"
         extra={
@@ -94,7 +106,7 @@ const Customers = () => {
       >
         <Table
           columns={columns}
-          dataSource={customers}
+          dataSource={filteredCustomers}
           pagination={false}
           loading={isLoading}
         />

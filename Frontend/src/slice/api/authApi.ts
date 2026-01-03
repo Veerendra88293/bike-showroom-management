@@ -6,7 +6,8 @@ export const authApi = createApi({
     baseUrl: "http://localhost:5000/api",
   }),
   endpoints: (builder) => ({
-    login: builder.mutation<//builder.mutation<ResponseType, RequestType>
+    login: builder.mutation<
+      //builder.mutation<ResponseType, RequestType>
       { token: string; role: string },
       { username: string; password: string; role: string }
     >({
@@ -15,10 +16,7 @@ export const authApi = createApi({
         method: "POST",
         body: data,
       }),
-      
-      
     }),
-    
   }),
 });
 

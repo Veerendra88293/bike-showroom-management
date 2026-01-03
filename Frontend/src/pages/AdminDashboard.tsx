@@ -7,8 +7,7 @@ import { useGetDashboardStatsQuery } from "../slice/services/dashboardApi";
 const { Title } = Typography;
 
 const AdminDashboard = () => {
-  const { data, isLoading } = useGetDashboardStatsQuery(undefined, {
-});
+  const { data, isLoading } = useGetDashboardStatsQuery(undefined, {});
   console.log("Admin Dashboard Data:", data);
 
   return (

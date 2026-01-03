@@ -15,7 +15,6 @@ const StaffDashboard = () => {
     <DashboardLayout>
       <Title level={3}>Dashboard</Title>
 
-
       <DashboardCards data={data} loading={isLoading} role="Staff" />
       <DashboardCharts data={data} role="Staff" />
       <RecentSalesTable sales={data?.recentSales || []} role="Staff" />

@@ -21,12 +21,16 @@ import {
   useGetSalesQuery,
 } from "../slice/services/salesApi";
 import { useGetBikesQuery } from "../slice/services/bikeApi";
+import { addNotification } from "../slice/services/notification";
+import { useDispatch } from "react-redux";
 
 const { Option } = Select;
 
 const Sales = () => {
   const [form] = Form.useForm();
-
+  const [searchText, setSearchText] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState<string | null>(null);
+  const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState<any>(null);
@@ -106,6 +110,14 @@ const Sales = () => {
         soldBy: localStorage.getItem("role") === "host" ? "Admin" : "Staff",
       }).unwrap(); // unwrap lets us catch backend errors
       message.success("Sale created successfully!");
+      dispatch(
+        addNotification({
+          id: Date.now().toString(),
+          message: "New bike sale completed",
+          type: "SALE",
+          time: new Date().toLocaleString(),
+        })
+      );
       setIsModalOpen(false);
     } catch (err: any) {
       if (err?.status === 401) {
@@ -128,9 +140,50 @@ const Sales = () => {
     message.error("Session expired. Please login again.");
     localStorage.removeItem("token");
   }
+  const filteredSales = salesData.filter((sale: any) => {
+    const matchesSearch =
+      sale.invoiceNo.toLowerCase().includes(searchText.toLowerCase()) ||
+      sale.customerName.toLowerCase().includes(searchText.toLowerCase()) ||
+      sale.bikeModel.toLowerCase().includes(searchText.toLowerCase());
+
+    const matchesPayment = paymentFilter
+      ? sale.paymentMode === paymentFilter
+      : true;
+
+    return matchesSearch && matchesPayment;
+  });
 
   return (
     <DashboardLayout>
+      <Space style={{ margin: 16 }} size="large">
+        <div>
+          <div style={{ fontSize: 12, color: "#555", marginBottom: 4 }}>
+            Search
+          </div>
+          <Input
+            placeholder="Invoice / Customer / Bike"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: 260 }}
+          />
+        </div>
+
+        {/* 🎚 Filter */}
+        <div>
+          <div style={{ fontSize: 12, color: "#555", marginBottom: 4 }}>
+            Payment Filter
+          </div>
+          <Select
+            placeholder="Select payment mode"
+            allowClear
+            style={{ width: 180 }}
+            onChange={(value) => setPaymentFilter(value)}
+          >
+            <Option value="Online">Online</Option>
+            <Option value="Showroom">Showroom</Option>
+          </Select>
+        </div>
+      </Space>
       <Card
         title="All Sales"
         extra={
@@ -145,7 +198,7 @@ const Sales = () => {
       >
         <Table
           columns={columns}
-          dataSource={salesData}
+          dataSource={filteredSales}
           loading={salesLoading}
         />
       </Card>

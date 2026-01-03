@@ -6,14 +6,13 @@ export const api = createApi({
     baseUrl: "http://localhost:5000/api",
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
-        console.log("Token from localStorage:", token);
+      console.log("Token from localStorage:", token);
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
 
       return headers;
     },
-    
   }),
   tagTypes: ["Dashboard"],
   endpoints: () => ({}),

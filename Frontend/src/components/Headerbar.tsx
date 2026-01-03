@@ -1,39 +1,80 @@
-import { BellOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Badge, Space } from "antd";
+import { BellOutlined, DeleteOutlined, UserOutlined } from "@ant-design/icons";
+import { Avatar, Badge, Drawer, List, Space, Tooltip, Button } from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "../store/store";
+import {
+  removeNotification,
+  clearNotifications,
+} from "../slice/services/notification";
+import { useState } from "react";
 
 const HeaderBar = () => {
+  const role = localStorage.getItem("role");
+  const dispatch = useDispatch();
+  const notifications = useSelector(
+    (state: RootState) => state.notifications.list
+  );
+
+  const [open, setOpen] = useState(false);
+
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "0 20px",
-        height: 64,
-      }}
-    >
-      {/* Left - Title */}
+    <>
       <div
-        style={{
-          fontSize: 20,
-          fontWeight: "bold",
-        }}
+        style={{ display: "flex", justifyContent: "space-between", height: 64 }}
       >
-        🏍 Java BikeShowRoom
+        <div style={{ fontSize: 20, fontWeight: "bold" }}>
+          🏍 Java BikeShowRoom
+        </div>
+
+        <Space size="large">
+          <Badge count={notifications.length}>
+            <div className="notification-bell">
+              <BellOutlined
+                style={{ fontSize: 18, cursor: "pointer" }}
+                onClick={() => setOpen(true)}
+              />
+            </div>
+          </Badge>
+
+          <Tooltip title={`Role: ${role}`}>
+            <Avatar icon={<UserOutlined />} />
+          </Tooltip>
+        </Space>
       </div>
 
-      {/* Right - Notification & User */}
-      <Space size="large">
-        <Badge count={2}>
-          <BellOutlined style={{ fontSize: 18 }} />
-        </Badge>
-
-        <Space>
-          <Avatar icon={<UserOutlined />} />
-          <span>Admin</span>
-        </Space>
-      </Space>
-    </div>
+      <Drawer
+        title="Notifications"
+        placement="right"
+        open={open}
+        onClose={() => setOpen(false)}
+        extra={
+          <Button
+            danger
+            size="small"
+            onClick={() => dispatch(clearNotifications())}
+          >
+            Clear All
+          </Button>
+        }
+      >
+        <List
+          dataSource={notifications}
+          locale={{ emptyText: "No notifications" }}
+          renderItem={(item) => (
+            <List.Item
+              actions={[
+                <DeleteOutlined
+                  onClick={() => dispatch(removeNotification(item.id))}
+                  style={{ color: "red", cursor: "pointer" }}
+                />,
+              ]}
+            >
+              <List.Item.Meta title={item.message} description={item.time} />
+            </List.Item>
+          )}
+        />
+      </Drawer>
+    </>
   );
 };
 

@@ -12,10 +12,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           <HeaderBar />
         </Header>
         <Divider style={{ margin: 0 }} />
-
         <MenuBar />
-
-        <Content style={{ margin: "16px" }}>{children}</Content>
+        <Content style={{ padding: "0px 10px" }}>{children}</Content>
       </Layout>
     </Layout>
   );

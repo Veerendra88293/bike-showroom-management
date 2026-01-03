@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense, useState } from "react";
 import { Spin } from "antd";
+import AdminReport from "./pages/Report";
 
 const Login = lazy(() => import("./pages/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -43,6 +44,7 @@ const App = () => {
               <Route path="/sales" element={<Sales />} />
               <Route path="/customers" element={<Customers />} />
               <Route path="/bikes" element={<Bikes />} />
+              <Route path="/reports" element={<AdminReport />} />
 
               {role === "Admin" && (
                 <Route path="/employees" element={<Employees />} />

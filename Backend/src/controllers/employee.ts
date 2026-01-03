@@ -31,7 +31,7 @@ export const addStaff = async (req: Request, res: Response) => {
 //Get All Staff
 export const getAllStaff = async (_req: Request, res: Response) => {
   try {
-    const staffList = await User.find({ role: "Staff" })
+    const staffList = await User.find({ role: "Staff" });
     return res.json(staffList);
   } catch (error) {
     return res.status(500).json({ message: "Server error" });

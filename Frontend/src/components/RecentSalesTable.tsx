@@ -1,12 +1,12 @@
 import { Card, Table, Tag } from "antd";
 
-const RecentSalesTable = ({
-  sales,
-  role,
-}: {
+type Props = {
   sales: any[];
-   role: "Admin" | "Staff";
-}) => {
+  role: "Admin" | "Staff";
+  showAll?: boolean;
+};
+
+const RecentSalesTable = ({ sales, role, showAll = false }: Props) => {
   const columns = [
     { title: "Invoice No", dataIndex: "invoice", key: "invoice" },
     { title: "Customer Name", dataIndex: "customer", key: "customer" },
@@ -34,8 +34,21 @@ const RecentSalesTable = ({
   }));
 
   return (
-    <Card title={role === "Admin" ? "Recent Sales Activity" : "My Recent Sales"} style={{ marginTop: 16 }}>
-      <Table columns={columns} dataSource={dataSource} pagination={false} />
+    <Card
+      title={
+        showAll
+          ? "All Sales Records"
+          : role === "Admin"
+          ? "Recent Sales Activity"
+          : "My Recent Sales"
+      }
+      style={{ marginTop: 16 }}
+    >
+      <Table
+        columns={columns}
+        dataSource={dataSource}
+        pagination={showAll ? { pageSize: 10, showSizeChanger: false } : false}
+      />
     </Card>
   );
 };

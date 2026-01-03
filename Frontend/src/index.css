@@ -1,0 +1,16 @@
+.LoginForm{
+  display: flex;
+  
+}
+.notification-bell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%; /* circle */
+  transition: background-color 0.2s;
+  padding: 6px; /* spacing around icon */
+}
+
+.notification-bell:hover {
+  background-color: #f0f0f0; /* light grey on hover */
+}

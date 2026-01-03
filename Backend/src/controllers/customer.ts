@@ -27,11 +27,22 @@ const customer = await Customer.create({
 //Get All Customers
 export const getCustomers = async (_req: Request, res: Response) => {
   try {
+  if (_req.user && _req.user.role === "Admin") {
     const customers = await Customer.find().sort({ createdAt: -1 });
     res.json(customers);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch customers" });
+  } else if (_req.user) {
+    const customers = await Customer.find({ staffId: _req.user.id }).sort({
+      createdAt: -1,
+    });
+    res.json(customers);
+  } else {
+    res.status(401).json({ message: "Unauthorized" });
   }
+} catch (e) {
+  console.error(e);
+  res.status(500).json({ message: "Failed to fetch customers" });
+}
+
 };
 
 // Delete Customer
