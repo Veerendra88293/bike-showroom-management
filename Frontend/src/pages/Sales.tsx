@@ -170,7 +170,6 @@ const Sales = () => {
   if (bikesError && (bikesError as any).status === 401) {
     message.error("Session expired. Please login again.");
     localStorage.removeItem("token");
-    window.location.href = "/login";
   }
   if (salesError && (salesError as any).status === 401) {
     message.error("Session expired. Please login again.");
