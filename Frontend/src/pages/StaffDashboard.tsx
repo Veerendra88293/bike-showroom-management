@@ -10,7 +10,7 @@ const { Title } = Typography;
 const StaffDashboard = () => {
   // fetch dashboard is already isolated per staff in backend
   const { data, isLoading } = useGetDashboardStatsQuery();
-  console.log(data, "staff");
+
   return (
     <DashboardLayout>
       <Title level={3}>Dashboard</Title>

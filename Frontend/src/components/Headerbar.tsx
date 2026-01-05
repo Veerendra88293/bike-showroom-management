@@ -26,18 +26,18 @@ const HeaderBar = () => {
           🏍 Java BikeShowRoom
         </div>
 
-        <Space size="large">
-          <Badge count={notifications.length}>
-            <div className="notification-bell">
-              <BellOutlined
-                style={{ fontSize: 18, cursor: "pointer" }}
-                onClick={() => setOpen(true)}
-              />
-            </div>
+        <Space size="large" align="center">
+          <Badge count={notifications.length} offset={[0, 4]}>
+            <BellOutlined
+              style={{ fontSize: 18, cursor: "pointer" }}
+              onClick={() => setOpen(true)}
+            />
           </Badge>
-
           <Tooltip title={`Role: ${role}`}>
-            <Avatar icon={<UserOutlined />} />
+            <Space align="center" style={{ cursor: "pointer" }}>
+              <Avatar icon={<UserOutlined />} />
+              <span>{localStorage.getItem("username")}</span>
+            </Space>
           </Tooltip>
         </Space>
       </div>

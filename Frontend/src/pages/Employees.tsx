@@ -18,18 +18,21 @@ import {
 import { DeleteOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import DashboardLayout from "../layout/DashboardLayout";
+import type { ColumnsType } from "antd/es/table";
+import type { AddStaffPayload, Staff } from "../types/staffType";
 
 const { Option } = Select;
 const { confirm } = Modal;
 
+
 const Employees = () => {
-  const { data: staffList = [], isLoading } = useGetStaffQuery();
+  const { data: staffList = [],} = useGetStaffQuery();
   const [addStaff] = useAddStaffMutation();
   const [deleteStaff] = useDeleteStaffMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toggleStaffStatus] = useToggleStaffStatusMutation();
 
-  const columns = [
+  const columns: ColumnsType<Staff> = [
     {
       title: "Name",
       dataIndex: "name",
@@ -50,7 +53,7 @@ const Employees = () => {
       title: "Status",
       dataIndex: "isActive",
       key: "isActive",
-      render: (isActive: boolean, record: any) => (
+      render: (isActive: boolean, record: Staff) => (
         <>
           <Tag color={isActive ? "green" : "red"}>
             {isActive ? "Active" : "Inactive"}
@@ -69,7 +72,7 @@ const Employees = () => {
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_: unknown, record: Staff) => (
         <Space>
           <Button
             danger
@@ -83,12 +86,12 @@ const Employees = () => {
     },
   ];
 
-  const handleAddStaff = async (values: any) => {
+  const handleAddStaff = async (values: AddStaffPayload) => {
     await addStaff(values);
     setIsModalOpen(false);
   };
 
-  const showDeleteConfirm = (staff: any) => {
+  const showDeleteConfirm = (staff: Staff) => {
     confirm({
       title: "Delete Staff",
       content: `Are you sure you want to delete ${staff.name}?`,
@@ -113,7 +116,8 @@ const Employees = () => {
           </Button>
         }
       >
-        <Table columns={columns} dataSource={staffList} pagination={false} />
+        <Table<Staff>
+      rowKey="_id" columns={columns} dataSource={staffList} pagination={false} />
       </Card>
 
       {/* Add Staff Modal */}

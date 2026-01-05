@@ -7,17 +7,18 @@ import {
   useAddCustomerMutation,
   useDeleteCustomerMutation,
 } from "../slice/services/customerApi";
-
+import type { ColumnsType } from "antd/es/table";
+import type { AddCustomerPayload, Customer } from "../types/customerPageType";
 const { confirm } = Modal;
 
 const Customers = () => {
   const [searchText, setSearchText] = useState("");
-  const { data: customers = [], isLoading } = useGetCustomersQuery();
+  const { data: customers = [], isLoading ,} = useGetCustomersQuery();
   const [addCustomer] = useAddCustomerMutation();
   const [deleteCustomer] = useDeleteCustomerMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const columns = [
+  const columns: ColumnsType<Customer> = [
     {
       title: "Customer Name",
       dataIndex: "name",
@@ -41,7 +42,7 @@ const Customers = () => {
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_, record: Customer) => (
         <Space>
           <Button
             danger
@@ -55,8 +56,8 @@ const Customers = () => {
     },
   ];
 
-  const handleAddCustomer = async (values: any) => {
-    console.log("Adding customer:", values);
+  const handleAddCustomer = async (values: AddCustomerPayload) => {
+  
 
     try {
       await addCustomer(values).unwrap();
@@ -64,11 +65,17 @@ const Customers = () => {
       message.success("Customer added successfully");
       setIsModalOpen(false);
     } catch (error: any) {
+      if(error.status===401){
+        message.error("Session expired. Please login again.")
+        localStorage.removeItem("token");
+        window.location.href = "/login";
+      }
+      
       message.error(error?.data?.message || "Customer already exists");
     }
   };
 
-  const showDeleteConfirm = (customer: any) => {
+  const showDeleteConfirm = (customer: Customer) => {
     confirm({
       title: "Delete Customer",
       content: `Delete ${customer.name}?`,
@@ -79,10 +86,11 @@ const Customers = () => {
     });
   };
   const filteredCustomers = customers.filter(
-    (customer: any) =>
+    (customer: Customer) =>
       customer.name.toLowerCase().includes(searchText.toLowerCase()) ||
       customer.phone.includes(searchText)
   );
+  
 
   return (
     <DashboardLayout>
@@ -104,7 +112,8 @@ const Customers = () => {
           </Button>
         }
       >
-        <Table
+        <Table<Customer>
+          rowKey="_id"
           columns={columns}
           dataSource={filteredCustomers}
           pagination={false}

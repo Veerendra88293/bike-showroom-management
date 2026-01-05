@@ -1,14 +1,27 @@
-import { Card, Button, Form, Input, Flex, Space, Radio, Alert } from "antd";
+import {
+  Card,
+  Button,
+  Form,
+  Input,
+  Flex,
+  Space,
+  Radio,
+  Alert,
+  message,
+} from "antd";
 import LoginImage from "../assets/LoginImage.png";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useLoginMutation } from "../slice/api/authApi";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 interface LoginProps {
   setToken: (token: string | null) => void;
   setRole: (role: string | null) => void;
 }
 function Login({ setToken, setRole }: LoginProps) {
-  const [login, { isLoading, error }] = useLoginMutation();
+  const [errorState, setError] = useState();
+
+  const [login, { error }] = useLoginMutation();
   const navigate = useNavigate();
   const handleSubmit = async (value: {
     username: string;
@@ -20,12 +33,14 @@ function Login({ setToken, setRole }: LoginProps) {
       console.log("LOGIN SUCCESSFUL", res);
       localStorage.setItem("token", res.token);
       localStorage.setItem("role", res.role);
+      localStorage.setItem("username", res.username);
       setToken(res.token);
       setRole(res.role);
-      console.log("Navigating to dashboard...");
+      message.success("Login successful");
       navigate("/dashboard", { replace: true });
-    } catch (err) {
-      console.error("LOGIN FAILED", err);
+    } catch (err: any) {
+      message.error(err.data?.message)
+      setError(err.data?.message || "Something went wrong");
     }
   };
 
@@ -34,7 +49,8 @@ function Login({ setToken, setRole }: LoginProps) {
       <div style={{ backgroundColor: "#F3F2F0" }}>
         <Flex justify="center" align="center" style={{ height: "100vh" }}>
           <Card title="Login Page" style={{ width: 800 }}>
-            {error && <Alert type="error" message="Invalid credentials" />}
+            {error && <Alert type="error" message={errorState} />}
+
             <Flex gap="large" align="center">
               <img
                 src={LoginImage}

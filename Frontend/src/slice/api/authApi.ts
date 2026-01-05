@@ -8,7 +8,7 @@ export const authApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation<
       //builder.mutation<ResponseType, RequestType>
-      { token: string; role: string },
+      { token: string; role: string; username: string },
       { username: string; password: string; role: string }
     >({
       query: (data) => ({

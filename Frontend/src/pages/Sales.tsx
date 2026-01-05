@@ -23,8 +23,44 @@ import {
 import { useGetBikesQuery } from "../slice/services/bikeApi";
 import { addNotification } from "../slice/services/notification";
 import { useDispatch } from "react-redux";
-
+import type { ColumnsType } from "antd/es/table";
 const { Option } = Select;
+// 🔹 Sale coming FROM backend (table, invoice)
+export interface Sale {
+  _id: string;
+  invoiceNo: string;
+  customerName: string;
+  bikeId: string;
+  bikeModel: string;
+  price: number;
+  discount: number;
+  totalAmount: number;
+  paymentMode: "Online" | "Showroom";
+  soldBy: "Admin" | "Staff";
+  staffId: string;
+  saleDate: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// 🔹 Bike used in dropdown
+export interface Bike {
+  _id: string;
+  bikemodel: string;
+  price: number;
+  stock: number;
+}
+
+// 🔹 Payload when creating a sale
+export interface CreateSalePayload {
+  customer: string;
+  bikeId: string;
+  price: number;
+  discount: number;
+  payment: "Online" | "Showroom";
+  soldBy: "Admin" | "Staff";
+}
+
 
 const Sales = () => {
   const [form] = Form.useForm();
@@ -33,7 +69,7 @@ const Sales = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
-  const [selectedSale, setSelectedSale] = useState<any>(null);
+  const [selectedSale, setSelectedSale] = useState<Sale|null>(null);
   const {
     data: salesData = [],
     isLoading: salesLoading,
@@ -45,9 +81,9 @@ const Sales = () => {
     isLoading: bikesLoading,
     error: bikesError,
   } = useGetBikesQuery();
-  console.log(bikes, "kajbckdbhci");
 
-  const columns = [
+
+  const columns:ColumnsType<Sale> = [
     {
       title: "Invoice No",
       dataIndex: "invoiceNo",
@@ -89,7 +125,7 @@ const Sales = () => {
     {
       title: "Action",
       key: "action",
-      render: (_: any, record: any) => (
+      render: (_,record) => (
         <Button
           icon={<EyeOutlined />}
           onClick={() => {
@@ -103,7 +139,7 @@ const Sales = () => {
     },
   ];
 
-  const handleAddSale = async (values: any) => {
+  const handleAddSale = async (values:CreateSalePayload) => {
     try {
       await createSales({
         ...values,
@@ -134,18 +170,17 @@ const Sales = () => {
   if (bikesError && (bikesError as any).status === 401) {
     message.error("Session expired. Please login again.");
     localStorage.removeItem("token");
+    window.location.href = "/login";
   }
-
   if (salesError && (salesError as any).status === 401) {
     message.error("Session expired. Please login again.");
     localStorage.removeItem("token");
   }
-  const filteredSales = salesData.filter((sale: any) => {
+  const filteredSales = salesData.filter((sale) => {
     const matchesSearch =
       sale.invoiceNo.toLowerCase().includes(searchText.toLowerCase()) ||
       sale.customerName.toLowerCase().includes(searchText.toLowerCase()) ||
       sale.bikeModel.toLowerCase().includes(searchText.toLowerCase());
-
     const matchesPayment = paymentFilter
       ? sale.paymentMode === paymentFilter
       : true;
@@ -290,13 +325,13 @@ const Sales = () => {
               placeholder="Select Bike"
               loading={bikesLoading}
               onChange={(bikeId) => {
-                const bike = bikes.find((b: any) => b._id === bikeId);
+                const bike = bikes.find((b) => b._id === bikeId);
                 if (bike) {
                   form.setFieldsValue({ price: bike.price }); // auto-fill price
                 }
               }}
             >
-              {bikes.map((bike: any) => (
+              {bikes.map((bike) => (
                 <Option key={bike._id} value={bike._id}>
                   {bike.bikemodel}
                 </Option>

@@ -1,4 +1,3 @@
-import React from "react";
 import { Card, Col, Row } from "antd";
 import { Line } from "@ant-design/plots";
 import {
@@ -14,43 +13,47 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import type { AdminChartsData, DaySales, PieLabelProps, StaffChartsData } from "../types/chartsType";
+import type { BikeModelSale,  RecentSale, ReportDashboardData } from "../types/cardType";
+
+
 
 type Props = {
-  data?: any;          // Dashboard stats (Admin/Staff)
+  data?: AdminChartsData|StaffChartsData;          // Dashboard stats (Admin/Staff)
   role: "Admin" | "Staff";
   report?: boolean;    // Show report bar chart if true
-  reportData?: any;    // Data for report bar chart (staffSalesAgg)
+  reportData?: ReportDashboardData;    // Data for report bar chart (staffSalesAgg)
 };
 
 const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
   const totalDays = new Date().getDate();
-  console.log(data?.bikesSoldTotal)
+
   // --- LINE CHART DATA ---
   let staffDailySales: { day: number; sales: number }[] = [];
 
   if (role === "Staff") {
     staffDailySales =
-      data?.recentSales?.reduce((acc: any, sale: any) => {
-        const saleDate = new Date(sale.createdAt || sale.date);
+      data?.recentSales?.reduce((acc: DaySales[], sale: RecentSale) => {
+        const saleDate = new Date(sale.createdAt);
         const day = saleDate.getDate();
-        const existing = acc.find((d: any) => d.day === day);
+        const existing = acc.find((d: DaySales) => d.day === day);
         if (existing) existing.sales += 1;
         else acc.push({ day, sales: 1 });
         return acc;
       }, []) || [];
   }
 
-  const rawDailySales = data?.dailySales || [];
+  const rawDailySales = data && "dailySales" in data ? data?.dailySales : [];
 
   const salesData = Array.from({ length: totalDays }, (_, i) => {
     const dayNumber = i + 1;
     let sales = 0;
 
     if (role === "Admin") {
-      const found = rawDailySales.find((item: any) => item?._id?.day === dayNumber);
+      const found = rawDailySales.find((item) => item?._id?.day === dayNumber);
       sales = found ? found.sales : 0;
     } else {
-      const found = staffDailySales.find((item: any) => item.day === dayNumber);
+      const found = staffDailySales.find((item: DaySales) => item.day === dayNumber);
       sales = found ? found.sales : 0;
     }
 
@@ -83,13 +86,13 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
 
   if (role === "Admin") {
     revenueData =
-      data?.bikeModelSales?.map((item: any) => ({
+      data?.bikeModelSales?.map((item: BikeModelSale) => ({
         type: item._id,
         value: item.value,
       })) || [];
   } else {
     const modelMap: Record<string, number> = {};
-    data?.recentSales?.forEach((sale: any) => {
+    data?.recentSales?.forEach((sale) => {
       const model = sale.bikeModel;
       if (modelMap[model]) modelMap[model] += 1;
       else modelMap[model] = 1;
@@ -104,13 +107,13 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
   const COLORS_2 = ["#fa8c16", "#13c2c2"];
 
   const renderInsideLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-  }: any) => {
+     cx = 0,
+  cy = 0,
+  midAngle = 0,
+  innerRadius = 0,
+  outerRadius = 0,
+  percent = 0,
+  }: PieLabelProps) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -133,7 +136,7 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
 
   // BAR CHART DATA (FOR REPORT ONLY)
  const staffSalesData = report
-  ? (reportData?.staffSalesAgg || []).map((item: any) => ({
+  ? (reportData?.staffSalesAgg || []).map((item) => ({
       staffName: item.staffName || "Unknown", 
       totalSales: item.totalSales || 0,
     }))

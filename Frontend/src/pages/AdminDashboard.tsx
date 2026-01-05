@@ -8,7 +8,7 @@ const { Title } = Typography;
 
 const AdminDashboard = () => {
   const { data, isLoading } = useGetDashboardStatsQuery(undefined, {});
-  console.log("Admin Dashboard Data:", data);
+
 
   return (
     <DashboardLayout>

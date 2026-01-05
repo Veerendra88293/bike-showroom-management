@@ -5,9 +5,11 @@ import {
   DollarOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
+import type { AdminDashboardData, ReportDashboardData, StaffDashboardData } from "../types/cardType";
+
 
 type Props = {
-  data: any;
+  data:  AdminDashboardData | ReportDashboardData | StaffDashboardData ;
   loading: boolean;
   role: "Admin" | "Staff";
   report?: boolean;
@@ -30,11 +32,14 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
         <Col xs={24} sm={12} md={8} lg={4}>
           <Card loading={loading}>
-            <Statistic
+            
+           
+  <Statistic
               title="Bikes Sold Total"
               value={data?.bikesSoldTotal || 0}
               prefix={<ShoppingCartOutlined />}
             />
+
           </Card>
         </Col>
 
@@ -50,11 +55,14 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
         <Col xs={24} sm={12} md={8} lg={4}>
           <Card loading={loading}>
-            <Statistic
+            
+            {data &&"totalStaff" in data && (
+  <Statistic
               title="Total Staff"
               value={data?.totalStaff || 0}
               prefix={<TeamOutlined />}
             />
+)}
           </Card>
         </Col>
 
@@ -99,11 +107,14 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
       {/* Bikes Sold Today */}
       <Col xs={24} sm={12} md={8} lg={4}>
         <Card loading={loading}>
-          <Statistic
+          
+          {data &&"bikesSoldToday" in data && (
+  <Statistic
             title="Bikes Sold Today"
             value={data?.bikesSoldToday || 0}
             prefix={<ShoppingCartOutlined />}
           />
+)}
         </Card>
       </Col>
 
@@ -134,11 +145,14 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
           <Col xs={24} sm={12} md={8} lg={4}>
             <Card loading={loading}>
-              <Statistic
+             
+              {data && "lowStock" in data && (
+  <Statistic
                 title="Low Stock Bikes"
                 value={data?.lowStock || 0}
                 prefix={<WarningOutlined />}
               />
+)}
             </Card>
           </Col>
         </>
@@ -159,11 +173,14 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
           <Col xs={24} sm={12} md={8} lg={4}>
             <Card loading={loading}>
-              <Statistic
+              
+              {data && "totalSales" in data && (
+  <Statistic
                 title="Total Sales This Month"
                 value={data?.totalSales || 0}
                 prefix={<ShoppingCartOutlined />}
               />
+)}
             </Card>
           </Col>
         </>
@@ -171,7 +188,9 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
       <Col xs={24} sm={12} md={8} lg={4}>
         <Card loading={loading}>
-          <Statistic
+          
+          {data && "totalSales" in data && (
+  <Statistic
             title={
               role === "Admin" ? "Total Sales Records" : "Today’s Sales Amount"
             }
@@ -181,6 +200,7 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
             prefix={<ShoppingCartOutlined />}
             suffix={role === "Staff" ? "₹" : undefined}
           />
+)}
         </Card>
       </Col>
     </Row>

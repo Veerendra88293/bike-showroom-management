@@ -7,7 +7,7 @@ import {
   LogoutOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Menu } from "antd";
+import { Menu, type MenuProps } from "antd";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../slice/api/api";
@@ -21,7 +21,7 @@ const MenuBar = () => {
   // Get current route name
   const selectedKey = location.pathname.split("/")[1] || "dashboard";
 
-  const handleMenuClick = ({ key }: any) => {
+  const handleMenuClick: MenuProps["onClick"] = ({ key }) => {
     if (key === "logout") {
       localStorage.clear();
       dispatch(api.util.resetApiState());

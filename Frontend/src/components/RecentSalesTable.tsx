@@ -1,10 +1,6 @@
 import { Card, Table, Tag } from "antd";
+import type { Props } from "../types/RecentSalestype";
 
-type Props = {
-  sales: any[];
-  role: "Admin" | "Staff";
-  showAll?: boolean;
-};
 
 const RecentSalesTable = ({ sales, role, showAll = false }: Props) => {
   const columns = [

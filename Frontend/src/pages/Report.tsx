@@ -1,4 +1,3 @@
-import React from "react";
 import { useGetReportStatsQuery } from "../slice/services/report";
 import DashboardCards from "../components/Cards";
 import DashboardLayout from "../layout/DashboardLayout";
@@ -16,7 +15,7 @@ const AdminReport = () => {
     {}
   );
   const { data } = useGetDashboardStatsQuery(undefined, {});
-  console.log("Admin report Data:", reportData);
+ 
 
   return (
     <DashboardLayout>
@@ -41,5 +40,4 @@ const AdminReport = () => {
     </DashboardLayout>
   );
 };
-
 export default AdminReport;

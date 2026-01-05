@@ -8,6 +8,7 @@ import {
   Input,
   InputNumber,
   Tag,
+  Select,
 } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useState } from "react";
@@ -18,7 +19,15 @@ import {
   useUpdateBikeMutation,
   useDeleteBikeMutation,
 } from "../slice/services/bikeApi";
-
+export interface Bike {
+  _id: string;
+  bikemodel: string;
+  company: string;
+  engine: number;
+  color?: string;
+  price: number;
+  stock: number;
+}
 const { confirm } = Modal;
 
 const Bikes = () => {
@@ -26,7 +35,9 @@ const Bikes = () => {
   const [searchText, setSearchText] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedBike, setSelectedBike] = useState<any>(null);
+  const [selectedBike, setSelectedBike] = useState<Bike | null>(null);
+  const [stockFilter, setStockFilter] = useState<"LOW" | null>(null);
+
   const { data: bikes = [], isLoading } = useGetBikesQuery();
   const [addBike] = useAddBikeMutation();
   const [updateBike] = useUpdateBikeMutation();
@@ -68,12 +79,11 @@ const Bikes = () => {
         <Tag color={stock > 5 ? "green" : "red"}>{stock}</Tag>
       ),
     },
-
     role === "Admin"
       ? {
           title: "Action",
           key: "action",
-          render: (_: any, record: any) => (
+          render: (_, record: Bike) => (
             <Space>
               <Button
                 icon={<EditOutlined />}
@@ -99,32 +109,35 @@ const Bikes = () => {
       : {},
   ].filter(Boolean);
 
-  const handleAddBike = async (values: any) => {
+  const handleAddBike = async (values: Bike) => {
     await addBike(values);
     setIsAddModalOpen(false);
   };
 
-  const handleEditBike = async (values: any) => {
-    console.log(values);
+  const handleEditBike = async (values: Partial<Bike>) => {
+    if (!selectedBike) return;
+   
     await updateBike({ id: selectedBike._id, ...values });
     setIsEditModalOpen(false);
   };
 
-  const showDeleteConfirm = (bike: any) => {
+  const showDeleteConfirm = (bike: Bike) => {
     confirm({
       title: "Delete Bike",
-      content: `Delete ${bike.model}?`,
+      content: `Delete ${bike.bikemodel}?`,
       okType: "danger",
       onOk() {
         deleteBike(bike._id);
       },
     });
   };
-  const filteredBikes = bikes.filter(
-    (bike: any) =>
-      bike.bikemodel.toLowerCase().includes(searchText.toLowerCase()) ||
-      bike.company.toLowerCase().includes(searchText.toLowerCase())
-  );
+  const filteredBikes = bikes
+    .filter(
+      (bike: Bike) =>
+        bike.bikemodel.toLowerCase().includes(searchText.toLowerCase()) ||
+        bike.company.toLowerCase().includes(searchText.toLowerCase())
+    )
+    .filter((bike) => (stockFilter === "LOW" ? bike.stock <= 5 : true));
 
   return (
     <DashboardLayout>
@@ -133,6 +146,13 @@ const Bikes = () => {
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}
         style={{ width: 300, margin: 10 }}
+      />
+      <Select
+        placeholder="Filter by Stock"
+        allowClear
+        value={stockFilter}
+        onChange={(value) => setStockFilter(value)}
+        options={[{ label: "Low Stock (≤ 5)", value: "LOW" }]}
       />
       <Card
         title="Bike Management"
@@ -148,8 +168,8 @@ const Bikes = () => {
           )
         }
       >
-        <Table
-          columns={columns as any}
+        <Table<Bike>
+          columns={columns}
           dataSource={filteredBikes}
           pagination={{ pageSize: 5 }}
           loading={isLoading}
