@@ -9,7 +9,6 @@ const { Title } = Typography;
 const AdminDashboard = () => {
   const { data, isLoading } = useGetDashboardStatsQuery(undefined, {});
 
-
   return (
     <DashboardLayout>
       <Title level={3}>Dashboard</Title>

@@ -1,4 +1,5 @@
 import { Card, Col, Row } from "antd";
+
 import { Line } from "@ant-design/plots";
 import {
   PieChart,
@@ -13,16 +14,24 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-import type { AdminChartsData, DaySales, PieLabelProps, StaffChartsData } from "../types/chartsType";
-import type { BikeModelSale,  RecentSale, ReportDashboardData } from "../types/cardType";
-
-
+import type {
+  AdminChartsData,
+  DaySales,
+  PieLabelProps,
+  StaffChartsData,
+} from "../types/chartsType";
+import type {
+  BikeModelSale,
+  RecentSale,
+  ReportDashboardData,
+} from "../types/cardType";
+import { memo } from "react";
 
 type Props = {
-  data?: AdminChartsData|StaffChartsData;          // Dashboard stats (Admin/Staff)
+  data?: AdminChartsData | StaffChartsData; // Dashboard stats (Admin/Staff)
   role: "Admin" | "Staff";
-  report?: boolean;    // Show report bar chart if true
-  reportData?: ReportDashboardData;    // Data for report bar chart (staffSalesAgg)
+  report?: boolean; // Show report bar chart if true
+  reportData?: ReportDashboardData; // Data for report bar chart (staffSalesAgg)
 };
 
 const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
@@ -53,7 +62,9 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
       const found = rawDailySales.find((item) => item?._id?.day === dayNumber);
       sales = found ? found.sales : 0;
     } else {
-      const found = staffDailySales.find((item: DaySales) => item.day === dayNumber);
+      const found = staffDailySales.find(
+        (item: DaySales) => item.day === dayNumber
+      );
       sales = found ? found.sales : 0;
     }
 
@@ -78,7 +89,10 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
     { type: "Available Bikes", value: data?.availableStock || 0 },
     {
       type: "Sold Bikes",
-      value: role === "Admin" ? data?.totalSales || 0 : data?.recentSales?.length || 0,
+      value:
+        role === "Admin"
+          ? data?.totalSales || 0
+          : data?.recentSales?.length || 0,
     },
   ];
 
@@ -107,12 +121,12 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
   const COLORS_2 = ["#fa8c16", "#13c2c2"];
 
   const renderInsideLabel = ({
-     cx = 0,
-  cy = 0,
-  midAngle = 0,
-  innerRadius = 0,
-  outerRadius = 0,
-  percent = 0,
+    cx = 0,
+    cy = 0,
+    midAngle = 0,
+    innerRadius = 0,
+    outerRadius = 0,
+    percent = 0,
   }: PieLabelProps) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
@@ -135,12 +149,12 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
   };
 
   // BAR CHART DATA (FOR REPORT ONLY)
- const staffSalesData = report
-  ? (reportData?.staffSalesAgg || []).map((item) => ({
-      staffName: item.staffName || "Unknown", 
-      totalSales: item.totalSales || 0,
-    }))
-  : [];
+  const staffSalesData = report
+    ? (reportData?.staffSalesAgg || []).map((item) => ({
+        staffName: item.staffName || "Unknown",
+        totalSales: item.totalSales || 0,
+      }))
+    : [];
 
   return (
     <>
@@ -148,7 +162,9 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         <Col xs={24} md={12}>
           <Card
-            title={role === "Admin" ? "Monthly Sales Report" : "My Monthly Sales"}
+            title={
+              role === "Admin" ? "Monthly Sales Report" : "My Monthly Sales"
+            }
             style={{ height: 300 }}
           >
             <Line {...lineConfig} />
@@ -185,7 +201,11 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
 
             <Col xs={24} md={12}>
               <Card
-                title={role === "Admin" ? "Top Selling Bike Models" : "My Top Selling Bikes"}
+                title={
+                  role === "Admin"
+                    ? "Top Selling Bike Models"
+                    : "My Top Selling Bikes"
+                }
                 style={{ height: 250 }}
               >
                 <div style={{ height: 200 }}>
@@ -202,7 +222,10 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
                         labelLine={false}
                       >
                         {revenueData.map((_, index) => (
-                          <Cell key={index} fill={COLORS_2[index % COLORS_2.length]} />
+                          <Cell
+                            key={index}
+                            fill={COLORS_2[index % COLORS_2.length]}
+                          />
                         ))}
                       </Pie>
                       <Legend />
@@ -241,4 +264,4 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
   );
 };
 
-export default DashboardCharts;
+export default memo(DashboardCharts);

@@ -24,43 +24,14 @@ import { useGetBikesQuery } from "../slice/services/bikeApi";
 import { addNotification } from "../slice/services/notification";
 import { useDispatch } from "react-redux";
 import type { ColumnsType } from "antd/es/table";
+import type { JwtPayload } from "../types/jwt";
+import { jwtDecode } from "jwt-decode";
+import { useGetCustomersQuery } from "../slice/services/customerApi";
+import type { Customer } from "../types/customerPageType";
+import type { ApiError } from "../types/apiError";
+import type { CreateSalePayload, Sale } from "../types/salesType";
 const { Option } = Select;
-// 🔹 Sale coming FROM backend (table, invoice)
-export interface Sale {
-  _id: string;
-  invoiceNo: string;
-  customerName: string;
-  bikeId: string;
-  bikeModel: string;
-  price: number;
-  discount: number;
-  totalAmount: number;
-  paymentMode: "Online" | "Showroom";
-  soldBy: "Admin" | "Staff";
-  staffId: string;
-  saleDate: string;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-// 🔹 Bike used in dropdown
-export interface Bike {
-  _id: string;
-  bikemodel: string;
-  price: number;
-  stock: number;
-}
-
-// 🔹 Payload when creating a sale
-export interface CreateSalePayload {
-  customer: string;
-  bikeId: string;
-  price: number;
-  discount: number;
-  payment: "Online" | "Showroom";
-  soldBy: "Admin" | "Staff";
-}
-
+//Sale coming FROM backend (table, invoice)
 
 const Sales = () => {
   const [form] = Form.useForm();
@@ -69,21 +40,14 @@ const Sales = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
-  const [selectedSale, setSelectedSale] = useState<Sale|null>(null);
-  const {
-    data: salesData = [],
-    isLoading: salesLoading,
-    error: salesError,
-  } = useGetSalesQuery();
+  const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
+  const { data: customers = [], isLoading: customersLoading } =
+    useGetCustomersQuery();
+  const { data: salesData = [], isLoading: salesLoading } = useGetSalesQuery();
   const [createSales] = useCreateSalesMutation();
-  const {
-    data: bikes = [],
-    isLoading: bikesLoading,
-    error: bikesError,
-  } = useGetBikesQuery();
+  const { data: bikes = [], isLoading: bikesLoading } = useGetBikesQuery();
 
-
-  const columns:ColumnsType<Sale> = [
+  const columns: ColumnsType<Sale> = [
     {
       title: "Invoice No",
       dataIndex: "invoiceNo",
@@ -125,7 +89,7 @@ const Sales = () => {
     {
       title: "Action",
       key: "action",
-      render: (_,record) => (
+      render: (_, record) => (
         <Button
           icon={<EyeOutlined />}
           onClick={() => {
@@ -139,11 +103,14 @@ const Sales = () => {
     },
   ];
 
-  const handleAddSale = async (values:CreateSalePayload) => {
+  const handleAddSale = async (values: CreateSalePayload) => {
+    const token = localStorage.getItem("token");
+    const decoded = token ? jwtDecode<JwtPayload>(token) : null;
+    const role = decoded?.role;
     try {
       await createSales({
         ...values,
-        soldBy: localStorage.getItem("role") === "host" ? "Admin" : "Staff",
+        soldBy: role === "Admin" ? "Admin" : "Staff",
       }).unwrap(); // unwrap lets us catch backend errors
       message.success("Sale created successfully!");
       dispatch(
@@ -155,26 +122,25 @@ const Sales = () => {
         })
       );
       setIsModalOpen(false);
-    } catch (err: any) {
-      if (err?.status === 401) {
+    } catch (err: unknown) {
+      const error = err as ApiError;
+
+      if (error.status === 401) {
         message.error("Session expired. Please login again.");
         localStorage.removeItem("token");
         window.location.href = "/login";
-      } else if (err?.data?.message) {
-        message.error(err.data.message);
-      } else {
-        message.error("Failed to create sale");
+        return;
       }
+
+      if (error.data?.message) {
+        message.error(error.data.message);
+        return;
+      }
+
+      message.error("Failed to create sale");
     }
   };
-  if (bikesError && (bikesError as any).status === 401) {
-    message.error("Session expired. Please login again.");
-    localStorage.removeItem("token");
-  }
-  if (salesError && (salesError as any).status === 401) {
-    message.error("Session expired. Please login again.");
-    localStorage.removeItem("token");
-  }
+
   const filteredSales = salesData.filter((sale) => {
     const matchesSearch =
       sale.invoiceNo.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -308,11 +274,26 @@ const Sales = () => {
       >
         <Form layout="vertical" form={form} onFinish={handleAddSale}>
           <Form.Item
-            label="Customer Name"
+            label="Customer"
             name="customer"
-            rules={[{ required: true }]}
+            rules={[{ required: true, message: "Please select customer" }]}
           >
-            <Input />
+            <Select
+              placeholder="Select Customer"
+              loading={customersLoading}
+              showSearch
+              optionFilterProp="label"
+            >
+              {customers.map((customer: Customer) => (
+                <Select.Option
+                  key={customer._id}
+                  value={customer.name} // 👈 send name to backend
+                  label={customer.name}
+                >
+                  {customer.name} ({customer.phone})
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
 
           <Form.Item

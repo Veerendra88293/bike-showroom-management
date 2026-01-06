@@ -1,8 +1,9 @@
+import type { Customer } from "../../types/customerPageType";
 import { api } from "../api/api";
 
 export const customerApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getCustomers: builder.query<any[], void>({
+    getCustomers: builder.query<Customer[], void>({
       query: () => "/customers",
       providesTags: ["Customers", "Dashboard"],
     }),

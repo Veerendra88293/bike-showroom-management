@@ -1,8 +1,9 @@
+import type { Bike } from "../../pages/Bikes";
 import { api } from "../api/api";
 
 export const bikeApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getBikes: builder.query<any[], void>({
+    getBikes: builder.query<Bike[], void>({
       query: () => "/bikes",
       providesTags: ["Bikes", "Dashboard"],
     }),

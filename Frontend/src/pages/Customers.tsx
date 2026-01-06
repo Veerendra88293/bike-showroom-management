@@ -9,11 +9,12 @@ import {
 } from "../slice/services/customerApi";
 import type { ColumnsType } from "antd/es/table";
 import type { AddCustomerPayload, Customer } from "../types/customerPageType";
+import type { ApiError } from "../types/apiError";
 const { confirm } = Modal;
 
 const Customers = () => {
   const [searchText, setSearchText] = useState("");
-  const { data: customers = [], isLoading ,} = useGetCustomersQuery();
+  const { data: customers = [], isLoading } = useGetCustomersQuery();
   const [addCustomer] = useAddCustomerMutation();
   const [deleteCustomer] = useDeleteCustomerMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,24 +58,26 @@ const Customers = () => {
   ];
 
   const handleAddCustomer = async (values: AddCustomerPayload) => {
-  
-
     try {
       await addCustomer(values).unwrap();
 
       message.success("Customer added successfully");
       setIsModalOpen(false);
-    } catch (error: any) {
-      if(error.status===401){
-        message.error("Session expired. Please login again.")
+    } catch (err: unknown) {
+      const error = err as ApiError;
+
+      if (error.status === 401) {
+        message.error("Session expired. Please login again.");
         localStorage.removeItem("token");
         window.location.href = "/login";
+        return;
       }
-      
-      message.error(error?.data?.message || "Customer already exists");
+
+      console.log(error, "error");
+
+      message.error(error.data?.message || "Customer already exists");
     }
   };
-
   const showDeleteConfirm = (customer: Customer) => {
     confirm({
       title: "Delete Customer",
@@ -90,7 +93,6 @@ const Customers = () => {
       customer.name.toLowerCase().includes(searchText.toLowerCase()) ||
       customer.phone.includes(searchText)
   );
-  
 
   return (
     <DashboardLayout>

@@ -2,7 +2,7 @@ export interface Staff {
   _id: string;
   name: string;
   username: string;
-  password: string;        // coming from API (even if you don’t show it)
+  password: string;        // coming from API 
   role: "Admin" | "Staff";
   isActive: boolean;
   createdAt: string;       // ISO date string

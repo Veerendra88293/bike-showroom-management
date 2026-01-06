@@ -24,9 +24,8 @@ import type { AddStaffPayload, Staff } from "../types/staffType";
 const { Option } = Select;
 const { confirm } = Modal;
 
-
 const Employees = () => {
-  const { data: staffList = [],} = useGetStaffQuery();
+  const { data: staffList = [] } = useGetStaffQuery();
   const [addStaff] = useAddStaffMutation();
   const [deleteStaff] = useDeleteStaffMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -117,7 +116,11 @@ const Employees = () => {
         }
       >
         <Table<Staff>
-      rowKey="_id" columns={columns} dataSource={staffList} pagination={false} />
+          rowKey="_id"
+          columns={columns}
+          dataSource={staffList}
+          pagination={false}
+        />
       </Card>
 
       {/* Add Staff Modal */}

@@ -19,6 +19,8 @@ import {
   useUpdateBikeMutation,
   useDeleteBikeMutation,
 } from "../slice/services/bikeApi";
+import { jwtDecode } from "jwt-decode";
+import type { JwtPayload } from "../types/jwt";
 export interface Bike {
   _id: string;
   bikemodel: string;
@@ -31,7 +33,9 @@ export interface Bike {
 const { confirm } = Modal;
 
 const Bikes = () => {
-  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
+  const decoded = token ? jwtDecode<JwtPayload>(token) : null;
+  const role = decoded?.role;
   const [searchText, setSearchText] = useState("");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -116,7 +120,7 @@ const Bikes = () => {
 
   const handleEditBike = async (values: Partial<Bike>) => {
     if (!selectedBike) return;
-   
+
     await updateBike({ id: selectedBike._id, ...values });
     setIsEditModalOpen(false);
   };

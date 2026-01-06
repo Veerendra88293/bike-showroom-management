@@ -1,22 +1,25 @@
 import { Card, Col, Row, Statistic } from "antd";
+import React, { memo } from "react";
 import {
   ShoppingCartOutlined,
   TeamOutlined,
   DollarOutlined,
   WarningOutlined,
 } from "@ant-design/icons";
-import type { AdminDashboardData, ReportDashboardData, StaffDashboardData } from "../types/cardType";
-
+import type {
+  AdminDashboardData,
+  ReportDashboardData,
+  StaffDashboardData,
+} from "../types/cardType";
 
 type Props = {
-  data:  AdminDashboardData | ReportDashboardData | StaffDashboardData ;
+  data: AdminDashboardData | ReportDashboardData | StaffDashboardData;
   loading: boolean;
   role: "Admin" | "Staff";
   report?: boolean;
 };
 
 const DashboardCards = ({ data, loading, role, report = false }: Props) => {
-
   if (report) {
     return (
       <Row gutter={[16, 16]}>
@@ -32,14 +35,11 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
         <Col xs={24} sm={12} md={8} lg={4}>
           <Card loading={loading}>
-            
-           
-  <Statistic
+            <Statistic
               title="Bikes Sold Total"
               value={data?.bikesSoldTotal || 0}
               prefix={<ShoppingCartOutlined />}
             />
-
           </Card>
         </Col>
 
@@ -55,14 +55,13 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
         <Col xs={24} sm={12} md={8} lg={4}>
           <Card loading={loading}>
-            
-            {data &&"totalStaff" in data && (
-  <Statistic
-              title="Total Staff"
-              value={data?.totalStaff || 0}
-              prefix={<TeamOutlined />}
-            />
-)}
+            {data && "totalStaff" in data && (
+              <Statistic
+                title="Total Staff"
+                value={data?.totalStaff || 0}
+                prefix={<TeamOutlined />}
+              />
+            )}
           </Card>
         </Col>
 
@@ -107,14 +106,13 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
       {/* Bikes Sold Today */}
       <Col xs={24} sm={12} md={8} lg={4}>
         <Card loading={loading}>
-          
-          {data &&"bikesSoldToday" in data && (
-  <Statistic
-            title="Bikes Sold Today"
-            value={data?.bikesSoldToday || 0}
-            prefix={<ShoppingCartOutlined />}
-          />
-)}
+          {data && "bikesSoldToday" in data && (
+            <Statistic
+              title="Bikes Sold Today"
+              value={data?.bikesSoldToday || 0}
+              prefix={<ShoppingCartOutlined />}
+            />
+          )}
         </Card>
       </Col>
 
@@ -145,14 +143,13 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
           <Col xs={24} sm={12} md={8} lg={4}>
             <Card loading={loading}>
-             
               {data && "lowStock" in data && (
-  <Statistic
-                title="Low Stock Bikes"
-                value={data?.lowStock || 0}
-                prefix={<WarningOutlined />}
-              />
-)}
+                <Statistic
+                  title="Low Stock Bikes"
+                  value={data?.lowStock || 0}
+                  prefix={<WarningOutlined />}
+                />
+              )}
             </Card>
           </Col>
         </>
@@ -173,14 +170,13 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
           <Col xs={24} sm={12} md={8} lg={4}>
             <Card loading={loading}>
-              
               {data && "totalSales" in data && (
-  <Statistic
-                title="Total Sales This Month"
-                value={data?.totalSales || 0}
-                prefix={<ShoppingCartOutlined />}
-              />
-)}
+                <Statistic
+                  title="Total Sales This Month"
+                  value={data?.totalSales || 0}
+                  prefix={<ShoppingCartOutlined />}
+                />
+              )}
             </Card>
           </Col>
         </>
@@ -188,23 +184,24 @@ const DashboardCards = ({ data, loading, role, report = false }: Props) => {
 
       <Col xs={24} sm={12} md={8} lg={4}>
         <Card loading={loading}>
-          
           {data && "totalSales" in data && (
-  <Statistic
-            title={
-              role === "Admin" ? "Total Sales Records" : "Today’s Sales Amount"
-            }
-            value={
-              role === "Admin" ? data?.totalSales : data?.totalRevenue || 0
-            }
-            prefix={<ShoppingCartOutlined />}
-            suffix={role === "Staff" ? "₹" : undefined}
-          />
-)}
+            <Statistic
+              title={
+                role === "Admin"
+                  ? "Total Sales Records"
+                  : "Today’s Sales Amount"
+              }
+              value={
+                role === "Admin" ? data?.totalSales : data?.totalRevenue || 0
+              }
+              prefix={<ShoppingCartOutlined />}
+              suffix={role === "Staff" ? "₹" : undefined}
+            />
+          )}
         </Card>
       </Col>
     </Row>
   );
 };
 
-export default DashboardCards;
+export default memo(DashboardCards);

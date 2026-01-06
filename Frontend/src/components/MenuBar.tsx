@@ -11,12 +11,16 @@ import { Menu, type MenuProps } from "antd";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../slice/api/api";
+import type { JwtPayload } from "../types/jwt";
+import { jwtDecode } from "jwt-decode";
 
 const MenuBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
+  const decoded = token ? jwtDecode<JwtPayload>(token) : null;
+  const role = decoded?.role;
 
   // Get current route name
   const selectedKey = location.pathname.split("/")[1] || "dashboard";

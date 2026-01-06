@@ -1,9 +1,10 @@
+import type { Staff } from "../../types/staffType";
 import { api } from "../api/api";
 
 export const employeeApi = api.injectEndpoints({
   endpoints: (builder) => ({
     // Get all staff
-    getStaff: builder.query<any[], void>({
+    getStaff: builder.query<Staff[], void>({
       query: () => "/employees",
       providesTags: ["Staff", "Dashboard"],
     }),

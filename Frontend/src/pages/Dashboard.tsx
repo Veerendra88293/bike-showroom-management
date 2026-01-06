@@ -1,10 +1,16 @@
 import AdminDashboard from "./AdminDashboard";
 import StaffDashboard from "./StaffDashboard";
+import { jwtDecode } from "jwt-decode";
+import type { JwtPayload } from "../types/jwt";
 
 const Dashboard = () => {
-  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
+  const decoded = token ? jwtDecode<JwtPayload>(token) : null;
+  if (!decoded) {
+    return null; // or <Login /> or redirect
+  }
 
-  if (role === "Admin") {
+  if (decoded.role === "Admin") {
     return <AdminDashboard />;
   }
 

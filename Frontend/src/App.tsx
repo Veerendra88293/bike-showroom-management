@@ -2,6 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense, useState } from "react";
 import { Spin } from "antd";
 import AdminReport from "./pages/Report";
+import { jwtDecode } from "jwt-decode";
+import type { JwtPayload } from "./types/jwt";
 
 const Login = lazy(() => import("./pages/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -14,7 +16,9 @@ const App = () => {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token")
   );
-  const [role, setRole] = useState<string | null>(localStorage.getItem("role"));
+  
+    const decoded = token ? jwtDecode<JwtPayload>(token) : null;
+    const role = decoded?.role
 
   return (
     <BrowserRouter>
@@ -35,7 +39,7 @@ const App = () => {
         <Routes>
           <Route
             path="/login"
-            element={<Login setToken={setToken} setRole={setRole} />}
+            element={<Login setToken={setToken}  />}
           />
 
           {token ? (

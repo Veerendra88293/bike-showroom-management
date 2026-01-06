@@ -6,10 +6,14 @@ import {
   removeNotification,
   clearNotifications,
 } from "../slice/services/notification";
-import { useState } from "react";
+import { memo, useState } from "react";
+import { jwtDecode } from "jwt-decode";
+import type { JwtPayload } from "../types/jwt";
 
 const HeaderBar = () => {
-  const role = localStorage.getItem("role");
+  const token = localStorage.getItem("token");
+  const decoded = token ? jwtDecode<JwtPayload>(token) : null;
+  const role = decoded?.role;
   const dispatch = useDispatch();
   const notifications = useSelector(
     (state: RootState) => state.notifications.list
@@ -78,4 +82,4 @@ const HeaderBar = () => {
   );
 };
 
-export default HeaderBar;
+export default memo(HeaderBar);

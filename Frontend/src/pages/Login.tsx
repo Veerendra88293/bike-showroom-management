@@ -14,12 +14,18 @@ import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { useLoginMutation } from "../slice/api/authApi";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import {jwtDecode} from "jwt-decode";
 interface LoginProps {
   setToken: (token: string | null) => void;
-  setRole: (role: string | null) => void;
+  
 }
-function Login({ setToken, setRole }: LoginProps) {
-  const [errorState, setError] = useState();
+type JwtPayload = {
+  id: string;
+  role: "Admin" | "Staff";
+  exp: number;
+};
+function Login({ setToken, }: LoginProps) {
+  const [errorState, setError] = useState('');
 
   const [login, { error }] = useLoginMutation();
   const navigate = useNavigate();
@@ -31,17 +37,23 @@ function Login({ setToken, setRole }: LoginProps) {
     try {
       const res = await login(value).unwrap();
       console.log("LOGIN SUCCESSFUL", res);
+      const decoded = jwtDecode<JwtPayload>(res.token);
+      console.log(decoded,'decoded')
       localStorage.setItem("token", res.token);
-      localStorage.setItem("role", res.role);
       localStorage.setItem("username", res.username);
       setToken(res.token);
-      setRole(res.role);
+      
       message.success("Login successful");
       navigate("/dashboard", { replace: true });
-    } catch (err: any) {
-      message.error(err.data?.message)
-      setError(err.data?.message || "Something went wrong");
-    }
+    } catch (err: unknown) {
+  const error = err as { data?: { message?: string } };
+
+  const errorMessage =
+    error.data?.message || "Something went wrong";
+
+  message.error(errorMessage);
+  setError(errorMessage);
+}
   };
 
   return (
