@@ -2,8 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense, useState } from "react";
 import { Spin } from "antd";
 import AdminReport from "./pages/Report";
-import { jwtDecode } from "jwt-decode";
-import type { JwtPayload } from "./types/jwt";
+import ProtectedRoute from "./components/ProtectedRoute";
+
 
 const Login = lazy(() => import("./pages/Login"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -16,9 +16,8 @@ const App = () => {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem("token")
   );
+
   
-    const decoded = token ? jwtDecode<JwtPayload>(token) : null;
-    const role = decoded?.role
 
   return (
     <BrowserRouter>
@@ -36,29 +35,27 @@ const App = () => {
           </div>
         }
       >
-        <Routes>
-          <Route
-            path="/login"
-            element={<Login setToken={setToken}  />}
-          />
+       <Routes>
+          {/* Public route */}
+          <Route path="/login"  element={<Login setToken={setToken} />} />
 
-          {token ? (
-            <>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/sales" element={<Sales />} />
-              <Route path="/customers" element={<Customers />} />
-              <Route path="/bikes" element={<Bikes />} />
-              <Route path="/reports" element={<AdminReport />} />
+          {/* Protected routes (any logged-in user) */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/sales" element={<Sales />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/bikes" element={<Bikes />} />
+            
+          </Route>
 
-              {role === "Admin" && (
-                <Route path="/employees" element={<Employees />} />
-              )}
+          {/* Admin-only routes */}
+          <Route element={<ProtectedRoute allowedRoles={["Admin"]} />}>
+            <Route path="/employees" element={<Employees />} />
+            <Route path="/reports" element={<AdminReport />} />
+          </Route>
 
-              <Route path="*" element={<Navigate to="/dashboard" />} />
-            </>
-          ) : (
-            <Route path="*" element={<Navigate to="/login" />} />
-          )}
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

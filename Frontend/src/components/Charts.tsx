@@ -165,7 +165,7 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
             title={
               role === "Admin" ? "Monthly Sales Report" : "My Monthly Sales"
             }
-            style={{ height: 300 }}
+            style={{ height: 330 }}
           >
             <Line {...lineConfig} />
           </Card>
@@ -174,7 +174,7 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
         <Col xs={24} md={12}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
-              <Card title="Bike Stock Overview" style={{ height: 250 }}>
+              <Card title="Bike Stock Overview" style={{ height: 330 }}>
                 <div style={{ height: 200 }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -206,7 +206,7 @@ const DashboardCharts = ({ data, role, report = false, reportData }: Props) => {
                     ? "Top Selling Bike Models"
                     : "My Top Selling Bikes"
                 }
-                style={{ height: 250 }}
+                style={{ height: 330 }}
               >
                 <div style={{ height: 200 }}>
                   <ResponsiveContainer width="100%" height="100%">

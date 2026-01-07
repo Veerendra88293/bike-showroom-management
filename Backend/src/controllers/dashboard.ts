@@ -9,8 +9,8 @@ export const getDashboardStats = async (req: any, res: Response) => {
     const userId = req.user?.id;
     const role = req.user?.role;
     const startOfMonth = new Date();
-startOfMonth.setDate(1); // first day of month
-startOfMonth.setHours(0, 0, 0, 0)
+    startOfMonth.setDate(1); // first day of month
+    startOfMonth.setHours(0, 0, 0, 0);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -28,7 +28,6 @@ startOfMonth.setHours(0, 0, 0, 0)
       availableStock,
     };
 
-  
     if (role === "Admin") {
       response.totalCustomers = await Customer.countDocuments();
       response.totalSales = await Sale.countDocuments();
@@ -46,20 +45,20 @@ startOfMonth.setHours(0, 0, 0, 0)
 
       // Monthly Sales for Line Chart
       response.dailySales = await Sale.aggregate([
-  {
-    $match: {
-      saleDate: { $gte: startOfMonth },
-      ...(role === "Staff" && { staffId: userId }), // filter for staff
-    },
-  },
-  {
-    $group: {
-      _id: { day: { $dayOfMonth: "$saleDate" } },
-      sales: { $sum: 1 },
-    },
-  },
-  { $sort: { "_id.day": 1 } },
-]);
+        {
+          $match: {
+            saleDate: { $gte: startOfMonth },
+            ...(role === "Staff" && { staffId: userId }), // filter for staff
+          },
+        },
+        {
+          $group: {
+            _id: { day: { $dayOfMonth: "$saleDate" } },
+            sales: { $sum: 1 },
+          },
+        },
+        { $sort: { "_id.day": 1 } },
+      ]);
 
       // Top Bike Models Pie Chart
       response.bikeModelSales = await Sale.aggregate([
@@ -73,11 +72,8 @@ startOfMonth.setHours(0, 0, 0, 0)
         { $limit: 5 },
       ]);
 
-      response.recentSales = await Sale.find()
-        .sort({ createdAt: -1 })
-        .limit(5);
+      response.recentSales = await Sale.find().sort({ createdAt: -1 }).limit(5);
     }
-
 
     if (role === "Staff") {
       const objectUserId = new mongoose.Types.ObjectId(userId);

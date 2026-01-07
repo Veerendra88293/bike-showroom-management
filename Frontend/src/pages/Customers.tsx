@@ -141,7 +141,7 @@ const Customers = () => {
           <Form.Item
             label="Phone Number"
             name="phone"
-            rules={[{ required: true, message: "Please enter phone number" }]}
+            rules={[{ required: true, message: "Please enter phone number" },{ pattern: /^\d{10}$/, message: "Phone number must be exactly 10 digits" }]}
           >
             <Input placeholder="Enter phone number" />
           </Form.Item>
