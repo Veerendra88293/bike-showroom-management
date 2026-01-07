@@ -21,6 +21,7 @@ import {
 } from "../slice/services/bikeApi";
 import { jwtDecode } from "jwt-decode";
 import type { JwtPayload } from "../types/jwt";
+import { getToken } from "../utils/getToken";
 export interface Bike {
   _id: string;
   bikemodel: string;
@@ -33,7 +34,7 @@ export interface Bike {
 const { confirm } = Modal;
 
 const Bikes = () => {
-  const token = localStorage.getItem("token");
+  const token = getToken();
   const decoded = token ? jwtDecode<JwtPayload>(token) : null;
   const role = decoded?.role;
   const [searchText, setSearchText] = useState("");

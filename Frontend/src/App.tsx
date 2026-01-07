@@ -3,6 +3,7 @@ import { lazy, Suspense, useState } from "react";
 import { Spin } from "antd";
 import AdminReport from "./pages/Report";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { getToken } from "./utils/getToken";
 
 
 const Login = lazy(() => import("./pages/Login"));
@@ -14,7 +15,7 @@ const Bikes = lazy(() => import("./pages/Bikes"));
 
 const App = () => {
   const [token, setToken] = useState<string | null>(
-    localStorage.getItem("token")
+    ()=>getToken()
   );
 
   

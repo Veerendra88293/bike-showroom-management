@@ -30,6 +30,7 @@ import { useGetCustomersQuery } from "../slice/services/customerApi";
 import type { Customer } from "../types/customerPageType";
 import type { ApiError } from "../types/apiError";
 import type { CreateSalePayload, Sale } from "../types/salesType";
+import { getToken } from "../utils/getToken";
 const { Option } = Select;
 //Sale coming FROM backend (table, invoice)
 
@@ -104,7 +105,7 @@ const Sales = () => {
   ];
 
   const handleAddSale = async (values: CreateSalePayload) => {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const decoded = token ? jwtDecode<JwtPayload>(token) : null;
     const role = decoded?.role;
     try {

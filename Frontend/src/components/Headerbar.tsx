@@ -9,9 +9,10 @@ import {
 import { memo, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import type { JwtPayload } from "../types/jwt";
+import { getToken } from "../utils/getToken";
 
 const HeaderBar = () => {
-  const token = localStorage.getItem("token");
+  const token = getToken()
   const decoded = token ? jwtDecode<JwtPayload>(token) : null;
   const role = decoded?.role;
   const dispatch = useDispatch();

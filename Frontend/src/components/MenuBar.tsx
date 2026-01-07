@@ -13,12 +13,13 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { api } from "../slice/api/api";
 import type { JwtPayload } from "../types/jwt";
 import { jwtDecode } from "jwt-decode";
+import { getToken } from "../utils/getToken";
 
 const MenuBar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const token = localStorage.getItem("token");
+  const token = getToken()
   const decoded = token ? jwtDecode<JwtPayload>(token) : null;
   const role = decoded?.role;
 
